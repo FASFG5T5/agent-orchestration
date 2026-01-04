@@ -305,6 +305,18 @@ npm run dev
 npm run clean && npm run build
 ```
 
+## Roadmap
+
+We're actively developing new features. Here's what's coming:
+
+- [ ] **External Memory Integration** - Integration with external memory providers like [Mem0](https://mem0.ai/), [Byteover](https://www.byterover.dev/), and our own memory solution
+- [ ] **Enhanced Sub-Agent Knowledge** - Fix limitations in knowledge sharing between main agent and sub-agents
+- [ ] **Research-First Workflow** - When building from scratch, agents should research first and prepare all requirements before coding
+- [ ] **Graceful Error Handling** - Better error handling and recovery across all operations
+- [ ] **Auto Documentation** - Automatically generate documentation from and for each sub-agent + main agent interactions
+
+Have a feature request? [Open an issue](https://github.com/madebyaris/agent-orchestration/issues)!
+
 ## Author
 
 **Aris Setiawan** - [madebyaris.com](https://madebyaris.com)

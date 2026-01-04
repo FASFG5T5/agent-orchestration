@@ -20,7 +20,7 @@ import {
 // Create server instance
 const server = new McpServer({
   name: 'agent-orchestration',
-  version: '1.0.0',
+  version: '0.5.0',
 });
 
 // Register all tools
