@@ -110,7 +110,7 @@ export async function registerProxyTools(server: McpServer): Promise<void> {
           {
              // We define a broad schema that accepts any property
              // This effectively mimics 'any' object but satisfies ZodRawShape type
-             ...Object.keys(tool.inputSchema.properties || {}).reduce((acc, key) => ({
+             ...Object.keys(tool.inputSchema?.properties || {}).reduce((acc, key) => ({
                  ...acc,
                  [key]: z.any().optional().describe('Proxied argument') 
              }), {})
