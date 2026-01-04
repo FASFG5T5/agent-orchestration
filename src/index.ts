@@ -15,6 +15,7 @@ import {
   registerTaskTools,
   registerCoordinationTools,
   registerUtilityTools,
+  registerProxyTools,
 } from './tools/index.js';
 
 // Create server instance
@@ -27,8 +28,9 @@ const server = new McpServer({
 registerAgentTools(server);
 registerMemoryTools(server);
 registerTaskTools(server);
-registerCoordinationTools(server);
 registerUtilityTools(server);
+
+
 
 /**
  * Start the MCP server
@@ -53,6 +55,9 @@ export async function startServer(): Promise<void> {
     closeDatabase();
     process.exit(0);
   });
+
+  // Register proxy tools
+  await registerProxyTools(server);
 
   // Connect and run
   await server.connect(transport);
