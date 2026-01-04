@@ -218,9 +218,9 @@ Check \`activeContext.md\` for current project state - it's auto-updated.
  * Run the MCP server
  */
 async function runServer(): Promise<void> {
-  // Import and run the server from the main entry point
-  const serverPath = path.join(__dirname, '..', 'index.js');
-  await import(serverPath);
+  // Import and start the server
+  const { startServer } = await import('../index.js');
+  await startServer();
 }
 
 /**

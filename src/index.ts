@@ -30,8 +30,10 @@ registerTaskTools(server);
 registerCoordinationTools(server);
 registerUtilityTools(server);
 
-// Main entry point
-async function main(): Promise<void> {
+/**
+ * Start the MCP server
+ */
+export async function startServer(): Promise<void> {
   // Initialize database
   const db = getDatabase();
   console.error(`Agent Orchestration server started. Database: ${db.dbPath}`);
@@ -40,13 +42,13 @@ async function main(): Promise<void> {
   const transport = new StdioServerTransport();
 
   // Handle shutdown
-  process.on('SIGINT', async () => {
+  process.on('SIGINT', () => {
     console.error('Shutting down...');
     closeDatabase();
     process.exit(0);
   });
 
-  process.on('SIGTERM', async () => {
+  process.on('SIGTERM', () => {
     console.error('Shutting down...');
     closeDatabase();
     process.exit(0);
@@ -56,9 +58,14 @@ async function main(): Promise<void> {
   await server.connect(transport);
 }
 
-// Run the server
-main().catch((error) => {
-  console.error('Fatal error:', error);
-  closeDatabase();
-  process.exit(1);
-});
+// Auto-run when executed directly (node dist/index.js)
+// Check if this file is the main module being run
+const isMainModule = process.argv[1]?.endsWith('index.js') && !process.argv[1]?.includes('cli.js');
+
+if (isMainModule) {
+  startServer().catch((error) => {
+    console.error('Fatal error:', error);
+    closeDatabase();
+    process.exit(1);
+  });
+}
