@@ -1,0 +1,46 @@
+{
+  "name": "agent-orchestration",
+  "version": "1.0.0",
+  "description": "Agent Orchestration - MCP server for multi-agent coordination across IDEs and CLI tools",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "agent-orchestration": "dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agents-md",
+    "cursor",
+    "ai-agents",
+    "orchestration",
+    "multi-agent",
+    "codex",
+    "aider",
+    "windsurf",
+    "copilot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "better-sqlite3": "^11.8.1",
+    "ulid": "^2.3.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

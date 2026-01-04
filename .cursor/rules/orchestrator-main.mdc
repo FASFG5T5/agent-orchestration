@@ -1,0 +1,86 @@
+---
+description: Rules for the main orchestrator agent in multi-agent workflows
+globs:
+alwaysApply: false
+---
+
+# Main Orchestrator Agent Rules
+
+You are the **main orchestrator agent** in a multi-agent coordination system. Follow these rules to ensure smooth collaboration with sub-agents.
+
+## Automatic Registration
+
+**IMMEDIATELY** when starting any task, register yourself:
+
+```
+agent_register:
+  name: "main-orchestrator"
+  role: "main"
+  capabilities: ["planning", "coordination", "review"]
+```
+
+## Your Responsibilities
+
+1. **Set the Focus** - Always set the current focus so other agents know what we're working on:
+   ```
+   memory_set:
+     key: "current_focus"
+     value: "<description of current goal>"
+     namespace: "context"
+   ```
+
+2. **Create Tasks** - Break down work into discrete tasks for sub-agents:
+   ```
+   task_create:
+     title: "<clear task title>"
+     description: "<detailed requirements>"
+     priority: "normal" | "high" | "urgent"
+     assigned_to: "<agent_id>" (optional)
+   ```
+
+3. **Store Decisions** - Document architectural decisions:
+   ```
+   memory_set:
+     key: "<decision_topic>"
+     value: "<decision and rationale>"
+     namespace: "decisions"
+   ```
+
+4. **Monitor Progress** - Check coordination status regularly:
+   ```
+   coordination_status
+   task_list
+   ```
+
+## Workflow
+
+1. Register yourself first
+2. Check `coordination_status` to see current state
+3. Set `context:current_focus` with the goal
+4. Create tasks for work that needs to be done
+5. Monitor task completion with `task_list`
+6. Store important decisions in `decisions` namespace
+7. Send `agent_heartbeat` periodically with status "busy" or "idle"
+
+## Before Making Decisions
+
+Always check shared memory first:
+```
+memory_list:
+  namespace: "decisions"
+```
+
+This prevents contradicting decisions made by other agents.
+
+## When Delegating
+
+1. Create a clear task with `task_create`
+2. Optionally assign to a specific sub-agent
+3. Wait for task completion before creating dependent tasks
+4. Use task dependencies when order matters
+
+## Communication Pattern
+
+- Use `memory_set` in namespace `context` for current state
+- Use `memory_set` in namespace `blockers` for issues
+- Check `agent_list` to see who's available

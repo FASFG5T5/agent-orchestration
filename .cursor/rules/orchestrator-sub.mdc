@@ -1,0 +1,114 @@
+---
+description: Rules for sub-agents spawned to work on specific tasks
+alwaysApply: false
+---
+
+# Sub-Agent Rules
+
+You are a **sub-agent** spawned to work on a specific task. Follow these rules.
+
+---
+
+## ⚠️ CRITICAL FIRST STEP ⚠️
+
+You were spawned to work on a specific task. **IMMEDIATELY** claim it:
+
+```
+claim_todo:
+  title: "<the task you were given>"
+  description: "<details if any>"
+```
+
+**DO NOT start coding until you have claimed your task.**
+
+This:
+1. Registers you with the orchestrator
+2. Creates the task if it doesn't exist
+3. Claims it so no other agent works on it
+4. Returns your agent ID and task ID
+
+---
+
+## After Claiming
+
+1. **Check context** to understand the project:
+   ```
+   memory_get:
+     key: "current_focus"
+     namespace: "context"
+   ```
+
+2. **Check decisions** to avoid contradicting them:
+   ```
+   memory_list:
+     namespace: "decisions"
+   ```
+
+3. **Lock files** before editing:
+   ```
+   lock_acquire:
+     resource: "<file_path>"
+     reason: "<what you're doing>"
+   ```
+
+---
+
+## While Working
+
+Update progress periodically:
+```
+task_update:
+  task_id: "<your_task_id>"
+  progress: 50
+```
+
+Store important findings:
+```
+memory_set:
+  key: "<finding>"
+  value: "<details>"
+  namespace: "findings"
+```
+
+---
+
+## When Done
+
+1. Complete the task:
+   ```
+   task_complete:
+     task_id: "<your_task_id>"
+     output: "<summary of what you did>"
+   ```
+
+2. Release any locks:
+   ```
+   lock_release:
+     resource: "<file_path>"
+   ```
+
+3. Unregister:
+   ```
+   agent_unregister
+   ```
+
+---
+
+## If Blocked
+
+Store the blocker so others know:
+```
+memory_set:
+  key: "blocker_<issue>"
+  value: "<what's blocking you>"
+  namespace: "blockers"
+```
+
+---
+
+## Important Rules
+
+1. **ALWAYS claim your task first** with `claim_todo`
+2. **ALWAYS lock files** before editing shared resources
+3. **ALWAYS complete your task** when done
+4. **Check shared memory** before making decisions that affect others

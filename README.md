@@ -1,0 +1,307 @@
+# Agent Orchestration
+
+A Model Context Protocol (MCP) server that enables multiple AI agents to share memory, coordinate tasks, and collaborate effectively across IDEs and CLI tools.
+
+## The Problem
+
+When running multiple AI agents, they face critical coordination challenges:
+
+1. **No Turn Awareness** - Agents don't know if it's their turn to act, leading to race conditions
+2. **File-Based Prediction** - Agents predict state from files, not shared memory, causing stale reads
+3. **Context Drift** - Parallel agents develop inconsistent understanding of the codebase
+4. **No Agent Discovery** - Agents are unaware of other agents working on the same project
+5. **Duplicate Work** - Multiple agents may attempt the same task simultaneously
+6. **Conflicting Edits** - Without coordination, agents overwrite each other's changes
+
+## Solution
+
+This MCP server provides:
+
+- **Shared Memory** - Agents can store and retrieve context, decisions, and findings
+- **Task Queue** - Turn-based task execution with dependencies
+- **Agent Discovery** - Agents can see who else is working on the project
+- **Resource Locking** - Prevent concurrent access to files or resources
+- **Coordination Status** - Real-time visibility into the orchestration state
+- **Auto Context Sync** - Automatically updates `activeContext.md` for easy reference
+
+## Compatibility
+
+Works with any AI coding agent that supports MCP or [AGENTS.md](https://agents.md/):
+
+- **OpenAI Codex**
+- **Google Jules**
+- **Cursor**
+- **Aider**
+- **Windsurf**
+- **VS Code Copilot**
+- **GitHub Copilot Coding Agent**
+- **Devin**
+- And many more!
+
+## Installation
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm
+
+### Install
+
+```bash
+# Clone or navigate to the project
+cd agent-orchestration
+
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+```
+
+## Quick Start
+
+### For Any IDE/CLI (AGENTS.md)
+
+```bash
+# Navigate to your project
+cd /path/to/your/project
+
+# Initialize with AGENTS.md
+npx agent-orchestration init
+```
+
+This creates `AGENTS.md` with full orchestration instructions that work with any AI coding agent.
+
+### For Cursor IDE
+
+```bash
+# Navigate to your project
+cd /path/to/your/project
+
+# Initialize for Cursor (copies .cursor/rules/)
+npx agent-orchestration init-cursor
+```
+
+This copies `.cursor/rules/` with Cursor-specific rules.
+
+## CLI Commands
+
+```bash
+npx agent-orchestration init           # Create AGENTS.md (works with any AI agent)
+npx agent-orchestration init-cursor    # Setup for Cursor IDE (.cursor/rules/)
+npx agent-orchestration serve          # Run the MCP server
+npx agent-orchestration help           # Show help
+```
+
+## Manual Setup
+
+### 1. Configure Your IDE
+
+Add to your MCP configuration (e.g., `~/.cursor/mcp.json` for Cursor):
+
+```json
+{
+  "mcpServers": {
+    "agent-orchestration": {
+      "command": "npx",
+      "args": ["-y", "agent-orchestration", "serve"],
+      "env": {
+        "MCP_ORCH_SYNC_CONTEXT": "true"
+      }
+    }
+  }
+}
+```
+
+The server automatically uses the current working directory as the project root.
+
+### 2. Start Your Session
+
+Use the `bootstrap` tool to start:
+
+```
+bootstrap
+```
+
+This registers you, shows current focus, pending tasks, and recent decisions.
+
+## Available Tools
+
+### Session Management
+
+| Tool | Description |
+|------|-------------|
+| `bootstrap` | **Start here!** Initialize session: register, get focus, tasks, decisions |
+| `claim_todo` | **For sub-agents**: Register + create/claim a task in one call |
+| `agent_whoami` | Get your current agent info (ID, name, role, status) |
+
+### Agent Management
+
+| Tool | Description |
+|------|-------------|
+| `agent_register` | Register this agent with the orchestration system |
+| `agent_heartbeat` | Send a heartbeat to indicate agent is active |
+| `agent_list` | List all registered agents |
+| `agent_unregister` | Unregister this agent (releases all locks) |
+
+### Shared Memory
+
+| Tool | Description |
+|------|-------------|
+| `memory_set` | Store a value in shared memory |
+| `memory_get` | Retrieve a value from shared memory |
+| `memory_list` | List all keys in a namespace |
+| `memory_delete` | Delete a value from shared memory |
+
+### Task Management
+
+| Tool | Description |
+|------|-------------|
+| `task_create` | Create a new task in the queue |
+| `task_claim` | Claim a task to work on |
+| `task_update` | Update task status or progress |
+| `task_complete` | Mark a task as completed |
+| `task_list` | List tasks with filters |
+| `is_my_turn` | Check if work is available for you |
+
+### Coordination
+
+| Tool | Description |
+|------|-------------|
+| `lock_acquire` | Acquire a lock on a resource |
+| `lock_release` | Release a held lock |
+| `lock_check` | Check if a resource is locked |
+| `coordination_status` | Get overall system status |
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     IDE / CLI Tool                           │
+├─────────────┬─────────────┬─────────────┬─────────────┬─────┤
+│ Main Agent  │ Sub-Agent 1 │ Sub-Agent 2 │ Sub-Agent 3 │ ... │
+└──────┬──────┴──────┬──────┴──────┬──────┴──────┬──────┴─────┘
+       │             │             │             │
+       └─────────────┴──────┬──────┴─────────────┘
+                            │
+                    ┌───────▼───────┐
+                    │  MCP Server   │
+                    │  (TypeScript) │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+      ┌───────▼───┐ ┌───────▼───┐ ┌───────▼───┐
+      │  Agents   │ │   Tasks   │ │  Memory   │
+      │  Registry │ │   Queue   │ │   Store   │
+      └───────────┘ └───────────┘ └───────────┘
+              │             │             │
+              └─────────────┼─────────────┘
+                            │
+                    ┌───────▼───────┐
+                    │    SQLite     │
+                    │  (per-project)│
+                    └───────────────┘
+```
+
+## Recommended Workflow
+
+### Main Orchestrator Agent
+
+```
+1. bootstrap                          # Start session
+2. memory_set current_focus "..."     # Set project focus
+3. task_create "Feature X"            # Create tasks
+4. task_create "Feature Y"
+5. coordination_status                # Monitor progress
+```
+
+### Sub-Agents (Spawned for Specific Work)
+
+```
+1. claim_todo "Feature X"             # Register + claim in one call
+2. lock_acquire "src/feature.ts"      # Lock files before editing
+3. [do the work]
+4. task_complete <task_id> "Done"     # Complete the task
+5. agent_unregister                   # Clean up
+```
+
+## Memory Namespaces
+
+Use these namespaces for organization:
+
+| Namespace | Purpose | Example Keys |
+|-----------|---------|--------------|
+| `context` | Current state and focus | `current_focus`, `current_branch` |
+| `decisions` | Architectural decisions | `auth_strategy`, `db_choice` |
+| `findings` | Analysis results | `perf_issues`, `security_audit` |
+| `blockers` | Issues blocking progress | `api_down`, `missing_deps` |
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MCP_ORCH_DB_PATH` | Path to SQLite database | `.agent-orchestration/orchestrator.db` |
+| `MCP_ORCH_SYNC_CONTEXT` | Auto-sync activeContext.md | `false` |
+| `MCP_ORCH_AGENT_NAME` | Default agent name | Auto-generated |
+| `MCP_ORCH_AGENT_ROLE` | Default agent role | `sub` |
+| `MCP_ORCH_CAPABILITIES` | Comma-separated capabilities | `code` |
+
+## AGENTS.md
+
+This project follows the [AGENTS.md](https://agents.md/) format - a simple, open format for guiding AI coding agents used by over 60k open-source projects.
+
+When you run `agent-orchestration init`, it creates an `AGENTS.md` file that works with:
+- OpenAI Codex
+- Google Jules
+- Cursor
+- Aider
+- Windsurf
+- VS Code Copilot
+- And many more!
+
+## Troubleshooting
+
+### Server won't start
+
+1. Make sure Node.js 18+ is installed: `node --version`
+2. Rebuild the project: `npm run build`
+3. Check the path in your MCP config is correct
+
+### Database errors
+
+The SQLite database is created automatically in `.agent-orchestration/`. If corrupted:
+
+```bash
+rm -rf .agent-orchestration/
+```
+
+It will be recreated on next server start.
+
+### Agents not seeing each other
+
+- Ensure all agents are using the same `cwd` in the MCP config
+- Check `agent_list` to see registered agents
+- Stale agents are auto-cleaned after 5 minutes of no heartbeat
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build
+npm run build
+
+# Watch mode (rebuild on changes)
+npm run dev
+
+# Clean build
+npm run clean && npm run build
+```
+
+## License
+
+MIT

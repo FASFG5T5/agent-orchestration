@@ -1,0 +1,107 @@
+---
+description: Auto-registration and coordination for any agent using Agent Orchestration
+alwaysApply: true
+---
+
+# CRITICAL: MULTI-AGENT COORDINATION ACTIVE
+
+This project uses **Agent Orchestration**. You MUST follow these rules.
+
+---
+
+## ⚠️ MANDATORY FIRST ACTION ⚠️
+
+**BEFORE doing ANYTHING else, you MUST run this tool:**
+
+```
+bootstrap
+```
+
+This registers you with the orchestrator and shows you:
+- Current project focus
+- Tasks assigned to you
+- Recent decisions
+
+**DO NOT skip this step. DO NOT start coding before running `bootstrap`.**
+
+---
+
+## If You Were Spawned With a Todo/Task
+
+If you were given a specific task or todo when you started (e.g., via "Build in New Agent"):
+
+**Run this IMMEDIATELY:**
+
+```
+claim_todo:
+  title: "<the todo/task title you were given>"
+```
+
+This will:
+1. Register you as an agent
+2. Create or find the matching task
+3. Claim it so other agents know you're working on it
+
+**Example:** If you were spawned with "Create .env.example for environment variables", run:
+
+```
+claim_todo:
+  title: "Create .env.example for environment variables"
+```
+
+---
+
+## Before Any File Edit
+
+1. Check if the file is locked:
+   ```
+   lock_check:
+     resource: "<file_path>"
+   ```
+
+2. If not locked, acquire a lock:
+   ```
+   lock_acquire:
+     resource: "<file_path>"
+     reason: "<what you're doing>"
+   ```
+
+3. Release when done.
+
+---
+
+## Check Before Major Work
+
+```
+is_my_turn
+```
+
+If "No" - wait or check what tasks are available:
+```
+task_list:
+  status: "pending"
+```
+
+---
+
+## Reference activeContext.md
+
+Check `activeContext.md` for current project state - it's auto-updated.
+
+---
+
+## When Done With Your Task
+
+```
+task_complete:
+  task_id: "<your_task_id>"
+  output: "<summary of what you did>"
+```
+
+---
+
+## On Session End
+
+```
+agent_unregister
+```
