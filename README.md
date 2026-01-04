@@ -41,27 +41,9 @@ Works with any AI coding agent that supports MCP or [AGENTS.md](https://agents.m
 - **Devin**
 - And many more!
 
-## Installation
-
-### Prerequisites
-
-- Node.js 18 or higher
-- npm
-
-### Install
-
-```bash
-# Clone or navigate to the project
-cd agent-orchestration
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
-
 ## Quick Start
+
+No installation required! Just use `npx`:
 
 ### For Any IDE/CLI (AGENTS.md)
 
@@ -96,9 +78,7 @@ npx agent-orchestration serve          # Run the MCP server
 npx agent-orchestration help           # Show help
 ```
 
-## Manual Setup
-
-### 1. Configure Your IDE
+## MCP Server Setup
 
 Add to your MCP configuration (e.g., `~/.cursor/mcp.json` for Cursor):
 
@@ -118,7 +98,7 @@ Add to your MCP configuration (e.g., `~/.cursor/mcp.json` for Cursor):
 
 The server automatically uses the current working directory as the project root.
 
-### 2. Start Your Session
+### Start Your Session
 
 Use the `bootstrap` tool to start:
 
@@ -176,37 +156,6 @@ This registers you, shows current focus, pending tasks, and recent decisions.
 | `lock_check` | Check if a resource is locked |
 | `coordination_status` | Get overall system status |
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     IDE / CLI Tool                           │
-├─────────────┬─────────────┬─────────────┬─────────────┬─────┤
-│ Main Agent  │ Sub-Agent 1 │ Sub-Agent 2 │ Sub-Agent 3 │ ... │
-└──────┬──────┴──────┬──────┴──────┬──────┴──────┬──────┴─────┘
-       │             │             │             │
-       └─────────────┴──────┬──────┴─────────────┘
-                            │
-                    ┌───────▼───────┐
-                    │  MCP Server   │
-                    │  (TypeScript) │
-                    └───────┬───────┘
-                            │
-              ┌─────────────┼─────────────┐
-              │             │             │
-      ┌───────▼───┐ ┌───────▼───┐ ┌───────▼───┐
-      │  Agents   │ │   Tasks   │ │  Memory   │
-      │  Registry │ │   Queue   │ │   Store   │
-      └───────────┘ └───────────┘ └───────────┘
-              │             │             │
-              └─────────────┼─────────────┘
-                            │
-                    ┌───────▼───────┐
-                    │    SQLite     │
-                    │  (per-project)│
-                    └───────────────┘
-```
-
 ## Recommended Workflow
 
 ### Main Orchestrator Agent
@@ -252,11 +201,42 @@ Use these namespaces for organization:
 | `MCP_ORCH_AGENT_ROLE` | Default agent role | `sub` |
 | `MCP_ORCH_CAPABILITIES` | Comma-separated capabilities | `code` |
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     IDE / CLI Tool                           │
+├─────────────┬─────────────┬─────────────┬─────────────┬─────┤
+│ Main Agent  │ Sub-Agent 1 │ Sub-Agent 2 │ Sub-Agent 3 │ ... │
+└──────┬──────┴──────┬──────┴──────┬──────┴──────┬──────┴─────┘
+       │             │             │             │
+       └─────────────┴──────┬──────┴─────────────┘
+                            │
+                    ┌───────▼───────┐
+                    │  MCP Server   │
+                    │  (TypeScript) │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+      ┌───────▼───┐ ┌───────▼───┐ ┌───────▼───┐
+      │  Agents   │ │   Tasks   │ │  Memory   │
+      │  Registry │ │   Queue   │ │   Store   │
+      └───────────┘ └───────────┘ └───────────┘
+              │             │             │
+              └─────────────┼─────────────┘
+                            │
+                    ┌───────▼───────┐
+                    │    SQLite     │
+                    │  (per-project)│
+                    └───────────────┘
+```
+
 ## AGENTS.md
 
 This project follows the [AGENTS.md](https://agents.md/) format - a simple, open format for guiding AI coding agents used by over 60k open-source projects.
 
-When you run `agent-orchestration init`, it creates an `AGENTS.md` file that works with:
+When you run `npx agent-orchestration init`, it creates an `AGENTS.md` file that works with:
 - OpenAI Codex
 - Google Jules
 - Cursor
@@ -270,8 +250,7 @@ When you run `agent-orchestration init`, it creates an `AGENTS.md` file that wor
 ### Server won't start
 
 1. Make sure Node.js 18+ is installed: `node --version`
-2. Rebuild the project: `npm run build`
-3. Check the path in your MCP config is correct
+2. Check the path in your MCP config is correct
 
 ### Database errors
 
@@ -291,11 +270,24 @@ It will be recreated on next server start.
 
 ## Development
 
+For contributors and local development:
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm
+
+### Setup
+
 ```bash
+# Clone the repository
+git clone https://github.com/madebyaris/agent-orchestration.git
+cd agent-orchestration
+
 # Install dependencies
 npm install
 
-# Build
+# Build the project
 npm run build
 
 # Watch mode (rebuild on changes)
