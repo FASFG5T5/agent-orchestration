@@ -1,5 +1,8 @@
 # Agent Orchestration
 
+[![npm version](https://badge.fury.io/js/agent-orchestration.svg)](https://www.npmjs.com/package/agent-orchestration)
+[![GitHub](https://img.shields.io/github/license/madebyaris/agent-orchestration)](https://github.com/madebyaris/agent-orchestration/blob/main/LICENSE)
+
 A Model Context Protocol (MCP) server that enables multiple AI agents to share memory, coordinate tasks, and collaborate effectively across IDEs and CLI tools.
 
 ## The Problem
@@ -301,6 +304,13 @@ npm run dev
 # Clean build
 npm run clean && npm run build
 ```
+
+## Author
+
+**Aris Setiawan** - [madebyaris.com](https://madebyaris.com)
+
+- GitHub: [@madebyaris](https://github.com/madebyaris)
+- Repository: [agent-orchestration](https://github.com/madebyaris/agent-orchestration)
 
 ## License
 
