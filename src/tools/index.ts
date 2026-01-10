@@ -7,3 +7,4 @@ export { registerMemoryTools } from './memory.js';
 export { registerTaskTools } from './task.js';
 export { registerCoordinationTools } from './coordination.js';
 export { registerUtilityTools } from './utility.js';
+export { registerProxyTools } from './proxy.js';
