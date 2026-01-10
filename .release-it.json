@@ -11,6 +11,6 @@
   },
   "hooks": {
     "after:bump": "bun install",
-    "before:release": "bun publish"
+    "after:release": "bun publish"
   }
 }
